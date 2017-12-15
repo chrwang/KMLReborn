@@ -24,8 +24,9 @@ After unzipping the directory, *do not* move any of the state files in or out of
 If you move, say the `North Carolina.shp` file out of 2010 DRA Shapefiles, then it will not be able to find any of the other files, and your shapefile will not display properly.
 
 Now, open a new project in QGIS. You should get a window looking something like this:
+![Blank QGIS Image](https://imgur.com/a/Xr5Gq)
 
-Open your state shapefile by pressing <kbd>⌃</kbd> <kbd>⇧</kbd>  <kbd>V</kbd> or <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>V</kbd>, or by going to `Layers > Add Layer > Add Vector Layer`.
+Open your state shapefile by pressing <kbd>⌃</kbd> <kbd>⇧</kbd> <kbd>V</kbd> or <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>V</kbd>, or by going to `Layers > Add Layer > Add Vector Layer`.
 Choose `File` and `UTF-8` under Source, and select the shapefile in the `Dataset` field.
 Repeat the process to open your DRA-exported CSV.
 In the bottom left corner, you should now see both the state shapefile and the `csv`.
@@ -70,4 +71,20 @@ Put some text in that field for each district.
 You can put whatever you want, but each box should be unique.
 We need this field in order for QGIS to do each district individually.
 
-Now, go to `Vector > Geoprocessing Tools > `
+Now, go to `Vector > Geoprocessing Tools > Convex Hull`.
+A new window will open.
+Choose your `Dissolved` layer as the `Input Layer`.
+For `Field`, choose the `Name` field that we created earlier.
+For `Method`, choose `Create convex hulls based on field`.
+Click run, and wait for the operation to finish.
+
+Once this completes, you should see a convex hull created for each district in your state.
+Right click the `Convex Hull` in the `Layers Panel`, and click `Save as`.
+Save the layer as a KML file.
+
+Go to [Google MyMaps](https://www.google.com/mymaps/) and create a new map.
+In the menu on the left, click `Add layer`, which will add an `Untitled Layer` in the menu.
+Name the layer whatever you want.
+Under the layer name, click `Import`, and add your KML file.
+Once the map loads, you should see the convex hulls on the map.
+If you click a hull, you'll see values for both the perimeter and the area. 
