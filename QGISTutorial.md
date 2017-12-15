@@ -24,7 +24,7 @@ After unzipping the directory, *do not* move any of the state files in or out of
 If you move, say the `North Carolina.shp` file out of 2010 DRA Shapefiles, then it will not be able to find any of the other files, and your shapefile will not display properly.
 
 Now, open a new project in QGIS. You should get a window looking something like this:
-![Blank QGIS Image](https://imgur.com/a/Xr5Gq)
+![Blank QGIS Image](https://i.imgur.com/2dHeMKX.png)
 
 Open your state shapefile by pressing <kbd>⌃</kbd> <kbd>⇧</kbd> <kbd>V</kbd> or <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>V</kbd>, or by going to `Layers > Add Layer > Add Vector Layer`.
 Choose `File` and `UTF-8` under Source, and select the shapefile in the `Dataset` field.
