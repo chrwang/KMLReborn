@@ -40,7 +40,7 @@ The first one is the source file, which is the CSV file.
 The second is the join field, which should be `GeoId<number>` or something named similarly.
 The target field should be `GeoID<number>`. The other options do not matter. Click `OK`.
 
-You should now see a new layer in the layer sidebar on the left. You can optionally save this file as a KML, if you want to have the precincts displayed in Google Maps.
+You should now see the join in the `Joins` tab. You can optionally save this file as a KML, if you want to have the precincts displayed in Google Maps.
 
 ### Dissolving into Districts
 
