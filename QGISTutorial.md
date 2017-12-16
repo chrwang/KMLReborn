@@ -47,12 +47,16 @@ You should now see the join in the `Joins` tab. You can optionally save this fil
 Currently, our map shows the precinct-level geography.
 We want the district-level geography.
 We are going to use an operation called `Dissolve`, which will remove all of the boundaries except for the ones that divide districts.
-Go to `Vector > Geoprocessing Tools > Dissolve`.
+Go to `Vector > Geoprocessing Tools > Dissolve`:
+![Dissolve Location](https://i.imgur.com/WMTobDd.png)
+
 For input layer, select your CSV-Shapefile merged file.
 Uncheck `Dissolve all`, and go down to the `Unique ID Fields` area.
-In the list on the left, find the district geometry, which should be named `<name_of_CSV>_Dis`.
+In the list on the left, find the district geometry, which should be named `<name_of_CSV>_Dis`, or `<name_of_CSV>_District`.
 Single-click it, and then click the single rightwards arrow to move it into the `Selected` field.
-Leave everything else as it is.
+Leave everything else as it is:
+![Dissolve Example](https://i.imgur.com/pjTX0KZ.png)
+
 Click the `Run` button, and wait for the operation to complete.
 This could take anywhere from 2 seconds to a minute, depending on how fast your computer is.
 

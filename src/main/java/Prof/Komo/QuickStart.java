@@ -21,7 +21,8 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * Prompts the user for a shapefile and displays the contents on the screen in a map frame.
  * <p>
- * This is the GeoTools Quickstart application used in documentationa and tutorials. *
+ * This is the GeoTools Quickstart application used in documentationa and tutorials.
+ * @version 0.1.0-alpha
  */
 public class QuickStart {
 

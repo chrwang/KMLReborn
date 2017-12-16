@@ -1,0 +1,41 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+repositories {
+    maven {
+        url 'http://repo.boundlessgeo.com/main'
+    }
+    maven {
+        url 'http://download.osgeo.org/webdav/geotools/'
+    }
+    maven {
+        url 'http://central.maven.org/maven2/'
+    }
+}
+
+dependencies {
+    compile group: 'org.geotools', name: 'gt-main', version: '19-SNAPSHOT'
+    compile group: 'org.geotools', name: 'gt-swing', version: '19-SNAPSHOT'
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
+    }
+}
+
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes 'Main-Class': 'Prof.Komo.QuickStart'
+    }
+}
+
+task getDeps(type: Copy) {
+    from sourceSets.main.runtimeClasspath
+    into 'runtime/'
+}
