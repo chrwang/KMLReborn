@@ -14,6 +14,7 @@ import org.geotools.styling.Style;
 import org.geotools.swing.JMapFrame;
 import org.geotools.swing.data.JFileDataStoreChooser;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.Geometry;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -50,10 +51,11 @@ public class QuickStart {
     }
     
     public static Coordinate welzl(ArrayList<Coordinate> P, ArrayList<Coordinate> R) {
+        System.out.println(P + " " + R);
         if(P.size() == 0 || R.size() >= 3) {
             if(cocircular(R) != null) {
                 Coordinate center = cocircular(R);
-                double radius = center.distance(R.get(0));
+                double radius = dist(center,R.get(0));
                 
                 center.z = radius;
                 
@@ -69,11 +71,8 @@ public class QuickStart {
         
         P.remove(index);
         Coordinate c = welzl(P, R);
-        double radius = c.z;
-        c.z = Double.NaN;
         
-        if(c.distance(p) <= radius) {
-            c.z = radius;
+        if(dist(c,p) <= c.z) {
             return c;
         } else {
             R.add(p);
@@ -121,7 +120,7 @@ public class QuickStart {
         
         for(int i = 0; i < coors.length; i++) {
             for(int j = i+1; j < coors.length; j++) {
-                double dist = coors[i].distance(coors[j]);
+                double dist = dist(coors[i],coors[j]);
                 if(dist > maxLength) {
                     first = coors[i];
                     second = coors[j];
@@ -145,8 +144,8 @@ public class QuickStart {
             double dx1 = coors[i].x - first.x;
             double dy1 = coors[i].y - first.y;
             
-            double projx = (dx1 * dx + dy1 * dy) * dx1;
-            double projy = (dx1 * dx + dy1 * dy) * dy1;
+            double projx = (dx1 * dx + dy1 * dy) * dx;
+            double projy = (dx1 * dx + dy1 * dy) * dy;
             
             double perpx = dx1 - projx;
             double perpy = dy1 - projy;
@@ -160,12 +159,15 @@ public class QuickStart {
         return maxWidth / maxLength;
     }
     
+    public static double dist(Coordinate x, Coordinate y) {
+        return Math.sqrt(Math.pow(x.x-y.x, 2) + Math.pow(x.y-y.y, 2));
+    }
     
     public static double convexHull(MultiPolygon poly) {
         double area = getArea(poly);
-        double hullArea = getArea((MultiPolygon) poly.convexHull());
+        double hullArea = getArea((Polygon) poly.convexHull());
         
-        return hullArea / area;
+        return area / hullArea;
     }
     
     public static double PP(MultiPolygon poly) {
@@ -176,7 +178,7 @@ public class QuickStart {
         return pp;
     }
     
-    public static double Schartzberg(MultiPolygon poly) {
+    public static double Schwartzberg(MultiPolygon poly) {
         double radius = Math.pow(getArea(poly) / Math.PI, 0.5);
         double circumference = 2 * Math.PI * radius;
         double peri = getPeri(poly);
@@ -188,6 +190,12 @@ public class QuickStart {
         double peri = poly.getLength();
         peri *= PERICONVERSION;
         return peri;
+    }
+    
+    public static double getArea(Polygon poly) {
+        double area = poly.getArea();
+        area *= AREACONVERSION;
+        return area;
     }
     
     public static double getArea(MultiPolygon poly) {
