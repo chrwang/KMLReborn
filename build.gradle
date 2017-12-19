@@ -17,6 +17,7 @@ repositories {
 dependencies {
     compile group: 'org.geotools', name: 'gt-main', version: '19-SNAPSHOT'
     compile group: 'org.geotools', name: 'gt-swing', version: '19-SNAPSHOT'
+    compile group: 'org.geotools', name: 'gt-shapefile', version: '19-SNAPSHOT'
 }
 
 buildscript {
@@ -30,8 +31,22 @@ buildscript {
 
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from('src/main/java') {
+        include '**/*.css'
+        include '**/**/*.css'
+    }
     manifest {
-        attributes 'Main-Class': 'Prof.Komo.QuickStart'
+        attributes 'Main-Class': 'Prof.Komo.MainUI'
+    }
+
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["scr/main/java"]
+            includes = ["**/*.css"]
+        }
     }
 }
 

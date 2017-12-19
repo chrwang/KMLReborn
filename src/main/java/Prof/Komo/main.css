@@ -1,0 +1,36 @@
+@import 'https://fonts.googleapis.com/css?family=Amiri';
+@import 'https://fonts.googleapis.com/css?family=VT323';
+
+.root {
+    -fx-background-color: linear-gradient(
+            #FF6AD5,
+            #C774E8,
+            #AD8CFF,
+            #8795E8,
+            #94D0FF);
+}
+
+#mainText {
+    -fx-font-family: "Amiri", "Toma Sans", "Tw Cen MT", "Futura", "Helvetica Neue", "Arial", sans-serif;
+    -fx-font-size: 24px;
+    -fx-fill: #818181;
+    -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.5), 6,0.0,0.0,2);
+}
+
+#logV{
+    -fx-font-family: "VT323","Courier New", monospace;
+    -fx-font-size: 16px;
+}
+
+.button {
+    -fx-font-family: "Amiri";
+    -fx-background-color: rgba(120,120,120,0.5);
+    -fx-cursor: pointer;
+    -fx-border-radius: 3px;
+    -fx-padding: 6px;
+    -fx-font-size: 16px;
+}
+
+.button:hover{
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 6, 0, 0, 0);
+}
