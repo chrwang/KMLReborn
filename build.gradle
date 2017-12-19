@@ -1,6 +1,5 @@
 apply plugin: 'java'
 apply plugin: 'idea'
-apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories {
     maven {
@@ -20,15 +19,6 @@ dependencies {
     compile group: 'org.geotools', name: 'gt-shapefile', version: '19-SNAPSHOT'
 }
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
-    }
-}
-
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     from('src/main/java') {
@@ -36,7 +26,7 @@ jar {
         include '**/**/*.css'
     }
     manifest {
-        attributes 'Main-Class': 'Prof.Komo.MainUI'
+        attributes 'Main-Class': 'Prof.Komo.MainUIOld'
     }
 
 }

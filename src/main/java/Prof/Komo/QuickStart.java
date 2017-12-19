@@ -3,6 +3,7 @@ package Prof.Komo;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.geotools.data.*;
 import org.geotools.data.simple.*;
@@ -35,9 +36,7 @@ public class QuickStart {
         Coordinate[] coors = poly.getCoordinates();
         
         ArrayList<Coordinate> list = new ArrayList<Coordinate>();
-        for(int i = 0; i < coors.length; i++) {
-            list.add(coors[i]);
-        }
+        Collections.addAll(list, coors);
         
         Coordinate circle = welzl(list, new ArrayList<Coordinate>());
         
@@ -51,7 +50,7 @@ public class QuickStart {
     }
     
     public static Coordinate welzl(ArrayList<Coordinate> P, ArrayList<Coordinate> R) {
-        System.out.println(P + " " + R);
+        //System.out.println(P + " " + R);
         if(P.size() == 0 || R.size() >= 3) {
             if(cocircular(R) != null) {
                 Coordinate center = cocircular(R);

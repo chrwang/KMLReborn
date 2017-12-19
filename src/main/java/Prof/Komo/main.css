@@ -17,7 +17,7 @@
     -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.5), 6,0.0,0.0,2);
 }
 
-#logV{
+.text-area .content{
     -fx-font-family: "VT323","Courier New", monospace;
     -fx-font-size: 16px;
 }
