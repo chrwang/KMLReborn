@@ -3,14 +3,12 @@ package Prof.Komo;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -23,27 +21,21 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.data.*;
 import org.geotools.data.simple.*;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
-import org.geotools.map.event.MapLayerEvent;
-import org.geotools.map.event.MapLayerListener;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Mark;
 import org.geotools.styling.Rule;
-import org.geotools.styling.SLD;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
@@ -57,30 +49,20 @@ import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.FeatureId;
-import org.opengis.geometry.coordinate.LineString;
-
-import javafx.scene.layout.VBox;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
-import java.io.File;
-
 import javax.swing.*;
-
-import org.geotools.swing.data.JFileDataStoreChooser;
 
 /**
  * App front end
  * Sponsored by Seimens Foundation.
  */
+@SuppressWarnings("restriction")
 public class MainUI extends Application
 {
 
     private static StyleFactory sf = CommonFactoryFinder.getStyleFactory();
     private static FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
-
+    
     /*
      * Convenient constants for the type of feature geometry in the shapefile
      */
@@ -98,7 +80,8 @@ public class MainUI extends Application
 
     private static JMapFrame mapFrame;
     private static SimpleFeatureSource featureSource;
-
+    private static FileDataStore store;
+    
     private static String geometryAttributeName;
     private static GeomType geometryType = GeomType.POLYGON;
 
@@ -163,16 +146,13 @@ public class MainUI extends Application
                 }
 
                 try {
-                    FileDataStore store = FileDataStoreFinder.getDataStore(file);
+                    store = FileDataStoreFinder.getDataStore(file);
                     featureSource = store.getFeatureSource();
-                    SimpleFeatureCollection collection = featureSource.getFeatures();
-
+                    
                     GeometryDescriptor geomDesc = featureSource.getSchema().getGeometryDescriptor();
                     geometryAttributeName = geomDesc.getLocalName();
+
                     
-                    SimpleFeatureIterator iter = collection.features();
-
-
                     MapContent map = new MapContent();
                     map.setTitle("Professor Komo");
                     Layer layer = new FeatureLayer(featureSource, createDefaultStyle());
@@ -180,7 +160,6 @@ public class MainUI extends Application
                     mapFrame = new JMapFrame(map);
                     mapFrame.enableToolBar(true);
                     mapFrame.enableStatusBar(true);
-
                     /*
                      * Before making the map frame visible we add a new button to its
                      * toolbar for our custom feature selection tool
@@ -201,7 +180,6 @@ public class MainUI extends Application
                             }));
                     mapFrame.setSize(500, 500);
                     mapFrame.setVisible(true);
-                    
                 } catch(IOException e) {
 
                 }
@@ -238,25 +216,22 @@ public class MainUI extends Application
          * the bounding box
          */
         Filter filter = ff.intersects(ff.property(geometryAttributeName), ff.literal(bbox));
-
+        
         /*
          * Use the filter to identify the selected features
          */
         try {
             SimpleFeatureCollection selectedFeatures =
                     featureSource.getFeatures(filter);
-
             Set<FeatureId> IDs = new HashSet<>();
             try (SimpleFeatureIterator iter = selectedFeatures.features()) {
                 while (iter.hasNext()) {
                     SimpleFeature feature = iter.next();
                     IDs.add(feature.getIdentifier());
-
                     //System.out.println("   " + feature.getIdentifier());
                 }
-
             }
-
+            
             if (IDs.isEmpty()) {
                 //System.out.println("   no feature selected");
             }
@@ -276,7 +251,7 @@ public class MainUI extends Application
      */
     public static void displaySelectedFeatures(Set<FeatureId> IDs) {
         Style style;
-
+        
         if (IDs.isEmpty()) {
             style = createDefaultStyle();
 
@@ -297,7 +272,7 @@ public class MainUI extends Application
                 
                 while (iter.hasNext()) {
                     SimpleFeature feature = iter.next();
-                    System.out.println(feature.getID());
+                    //System.out.println(feature.getID());
                     MultiPolygon poly = (MultiPolygon) feature.getAttribute("the_geom");
                     
                     if(IDs.contains(feature.getIdentifier())) {
@@ -317,7 +292,7 @@ public class MainUI extends Application
             }
 
             if (IDs.isEmpty()) {
-                System.out.println("   no feature selected");
+                //System.out.println("   no feature selected");
             }
 
         } catch (Exception ex) {
