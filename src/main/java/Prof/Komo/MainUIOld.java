@@ -3,14 +3,12 @@ package Prof.Komo;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -23,27 +21,21 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.data.*;
 import org.geotools.data.simple.*;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
-import org.geotools.map.event.MapLayerEvent;
-import org.geotools.map.event.MapLayerListener;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Mark;
 import org.geotools.styling.Rule;
-import org.geotools.styling.SLD;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
@@ -57,24 +49,14 @@ import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.FeatureId;
-import org.opengis.geometry.coordinate.LineString;
-
-import javafx.scene.layout.VBox;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
-import java.io.File;
-
 import javax.swing.*;
-
-import org.geotools.swing.data.JFileDataStoreChooser;
 
 /**
  * App front end
  * Sponsored by Seimens Foundation.
  */
+@SuppressWarnings("restriction")
 public class MainUIOld extends Application
 {
 
@@ -98,6 +80,7 @@ public class MainUIOld extends Application
 
     private static JMapFrame mapFrame;
     private static SimpleFeatureSource featureSource;
+    private static FileDataStore store;
 
     private static String geometryAttributeName;
     private static GeomType geometryType = GeomType.POLYGON;
@@ -109,7 +92,7 @@ public class MainUIOld extends Application
     static double Schwartz = -1;
 
     static TextArea textArea;
-    
+
     public static void main( String[] args )
     {
         launch(args);
@@ -150,7 +133,7 @@ public class MainUIOld extends Application
 
 
 
-        textArea.setText("Reock:\t\t\t" + Reock + "\nHarris:\t\t\t" + Harr + "\nConvex Hull:\t\t" + Convex 
+        textArea.setText("Reock:\t\t\t" + Reock + "\nHarris:\t\t\t" + Harr + "\nConvex Hull:\t\t" + Convex
                 + "\nPolsby-Popper:\t" + PolsbyP + "\nSchwartzberg:\t\t" + Schwartz);
 
         b2.setOnAction(new EventHandler<ActionEvent>() {
@@ -163,14 +146,11 @@ public class MainUIOld extends Application
                 }
 
                 try {
-                    FileDataStore store = FileDataStoreFinder.getDataStore(file);
+                    store = FileDataStoreFinder.getDataStore(file);
                     featureSource = store.getFeatureSource();
-                    SimpleFeatureCollection collection = featureSource.getFeatures();
 
                     GeometryDescriptor geomDesc = featureSource.getSchema().getGeometryDescriptor();
                     geometryAttributeName = geomDesc.getLocalName();
-                    
-                    SimpleFeatureIterator iter = collection.features();
 
 
                     MapContent map = new MapContent();
@@ -180,7 +160,6 @@ public class MainUIOld extends Application
                     mapFrame = new JMapFrame(map);
                     mapFrame.enableToolBar(true);
                     mapFrame.enableStatusBar(true);
-
                     /*
                      * Before making the map frame visible we add a new button to its
                      * toolbar for our custom feature selection tool
@@ -201,7 +180,6 @@ public class MainUIOld extends Application
                             }));
                     mapFrame.setSize(500, 500);
                     mapFrame.setVisible(true);
-                    
                 } catch(IOException e) {
 
                 }
@@ -245,16 +223,13 @@ public class MainUIOld extends Application
         try {
             SimpleFeatureCollection selectedFeatures =
                     featureSource.getFeatures(filter);
-
             Set<FeatureId> IDs = new HashSet<>();
             try (SimpleFeatureIterator iter = selectedFeatures.features()) {
                 while (iter.hasNext()) {
                     SimpleFeature feature = iter.next();
                     IDs.add(feature.getIdentifier());
-
                     //System.out.println("   " + feature.getIdentifier());
                 }
-
             }
 
             if (IDs.isEmpty()) {
@@ -287,37 +262,37 @@ public class MainUIOld extends Application
         Layer layer = mapFrame.getMapContent().layers().get(0);
         ((FeatureLayer) layer).setStyle(style);
         mapFrame.getMapPane().repaint();
-        
-        
-        
+
+
+
         try {
             SimpleFeatureCollection selectedFeatures = featureSource.getFeatures();
 
             try (SimpleFeatureIterator iter = selectedFeatures.features()) {
-                
+
                 while (iter.hasNext()) {
                     SimpleFeature feature = iter.next();
-                    System.out.println(feature.getID());
+                    //System.out.println(feature.getID());
                     MultiPolygon poly = (MultiPolygon) feature.getAttribute("the_geom");
-                    
+
                     if(IDs.contains(feature.getIdentifier())) {
                         Reock = QuickStart.Reock(poly);
                         Harr = QuickStart.Harris(poly);
                         Convex = QuickStart.convexHull(poly);
                         PolsbyP = QuickStart.PP(poly);
                         Schwartz = QuickStart.Schwartzberg(poly);
-                        
-                        textArea.setText("Reock:\t\t\t" + Reock + "\nHarris:\t\t\t" + Harr + "\nConvex Hull:\t\t" + Convex 
+
+                        textArea.setText("Reock:\t\t\t" + Reock + "\nHarris:\t\t\t" + Harr + "\nConvex Hull:\t\t" + Convex
                                 + "\nPolsby-Popper:\t" + PolsbyP + "\nSchwartzberg:\t\t" + Schwartz);
                         break;
                     }
-                     
+
                 }
 
             }
 
             if (IDs.isEmpty()) {
-                System.out.println("   no feature selected");
+                //System.out.println("   no feature selected");
             }
 
         } catch (Exception ex) {
@@ -370,33 +345,33 @@ public class MainUIOld extends Application
         Stroke stroke = sf.createStroke(ff.literal(outlineColor), ff.literal(LINE_WIDTH));
 
         switch (geometryType) {
-        case POLYGON:
-            fill = sf.createFill(ff.literal(fillColor), ff.literal(OPACITY));
-            symbolizer = sf.createPolygonSymbolizer(stroke, fill, geometryAttributeName);
-            break;
+            case POLYGON:
+                fill = sf.createFill(ff.literal(fillColor), ff.literal(OPACITY));
+                symbolizer = sf.createPolygonSymbolizer(stroke, fill, geometryAttributeName);
+                break;
 
-        case LINE:
-            symbolizer = sf.createLineSymbolizer(stroke, geometryAttributeName);
-            break;
+            case LINE:
+                symbolizer = sf.createLineSymbolizer(stroke, geometryAttributeName);
+                break;
 
-        case POINT:
-            fill = sf.createFill(ff.literal(fillColor), ff.literal(OPACITY));
+            case POINT:
+                fill = sf.createFill(ff.literal(fillColor), ff.literal(OPACITY));
 
-            Mark mark = sf.getCircleMark();
-            mark.setFill(fill);
-            mark.setStroke(stroke);
+                Mark mark = sf.getCircleMark();
+                mark.setFill(fill);
+                mark.setStroke(stroke);
 
-            Graphic graphic = sf.createDefaultGraphic();
-            graphic.graphicalSymbols().clear();
-            graphic.graphicalSymbols().add(mark);
-            graphic.setSize(ff.literal(POINT_SIZE));
+                Graphic graphic = sf.createDefaultGraphic();
+                graphic.graphicalSymbols().clear();
+                graphic.graphicalSymbols().add(mark);
+                graphic.setSize(ff.literal(POINT_SIZE));
 
-            symbolizer = sf.createPointSymbolizer(graphic, geometryAttributeName);
+                symbolizer = sf.createPointSymbolizer(graphic, geometryAttributeName);
         }
 
         Rule rule = sf.createRule();
         rule.symbolizers().add(symbolizer);
         return rule;
     }
-
 }
+

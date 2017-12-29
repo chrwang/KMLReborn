@@ -6,13 +6,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.control.TextArea;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
@@ -53,8 +50,14 @@ import java.util.Set;
  * Acknowledgements to Professor Andrew R. M. Komo for technical, moral, and metaphorical support
  * Sponsored by Seimens Foundation.
  */
-@SuppressWarnings("Duplicates")
+@SuppressWarnings({"restriction", "Duplicates"})
 public class MainUI extends Application {
+    /*
+     * Convenient constants for the type of feature geometry in the shapefile
+     */
+    private enum GeomType {
+        POINT, LINE, POLYGON
+    }
 
     /*
      * Some default style variables
@@ -70,6 +73,7 @@ public class MainUI extends Application {
     private static FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
     private static JMapFrame mapFrame;
     private static SimpleFeatureSource featureSource;
+    private static FileDataStore store;
     private static String geometryAttributeName;
     private static GeomType geometryType = GeomType.POLYGON;
     private static double Reock = -1;
@@ -83,6 +87,97 @@ public class MainUI extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public void start(Stage ps) throws Exception {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ps.setTitle("Prof. Andrew R. M. Komo, Inc.");
+
+        GridPane gd = new GridPane();
+        gd.setAlignment(Pos.CENTER);
+        gd.setHgap(10);
+        gd.setVgap(10);
+        gd.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scTitle = new Text("Welcome to Prof. Andrew R. M. Komo, Inc (R) Redistricting Maths App!");
+        gd.add(scTitle, 0, 0, 3, 1);
+
+        Button btn = new Button("Exit");
+        btn.setOnAction(event -> System.exit(0));
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(btn);
+        gd.add(hbBtn, 0, 4);
+
+        Button b2 = new Button("Start");
+        HBox hb2 = new HBox(10);
+        hb2.setAlignment(Pos.BOTTOM_RIGHT);
+        hb2.getChildren().add(b2);
+        gd.add(hb2, 2, 4);
+
+        logView.setText(logView.getText() + " at " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        logView.setEditable(false);
+        logView.setStyle("-fx-font-family: \"VT323\",\"Courier New\", monospace; -fx-font-size: 16px;");
+        gd.add(logView, 1, 2);
+        logView.setText(logView.getText() + "\nReock:\t\t\t" + Reock + "\nHarris:\t\t\t" + Harr + "\nConvex Hull:\t\t" + Convex
+                + "\nPolsby-Popper:\t" + PolsbyP + "\nSchwartzberg:\t\t" + Schwartz);
+
+        b2.setOnAction(arg0 -> {
+            File file = null;
+            while (file == null) {
+                System.out.println("waiting");
+                file = JFileDataStoreChooser.showOpenFile("shp", null);
+            }
+
+            try {
+                store = FileDataStoreFinder.getDataStore(file);
+                featureSource = store.getFeatureSource();
+
+                GeometryDescriptor geomDesc = featureSource.getSchema().getGeometryDescriptor();
+                geometryAttributeName = geomDesc.getLocalName();
+
+                MapContent map = new MapContent();
+                map.setTitle("Professor Komo");
+                Layer layer = new FeatureLayer(featureSource, createDefaultStyle());
+                map.addLayer(layer);
+                mapFrame = new JMapFrame(map);
+                mapFrame.enableToolBar(true);
+                mapFrame.enableStatusBar(true);
+                /*
+                 * Before making the map frame visible we add a new button to its
+                 * toolbar for our custom feature selection tool
+                 */
+                JToolBar toolBar = mapFrame.getToolBar();
+                JButton btn1 = new JButton("Select");
+                toolBar.addSeparator();
+                toolBar.add(btn1);
+
+
+                btn1.addActionListener(e -> mapFrame.getMapPane().setCursorTool(
+                        new CursorTool() {
+
+                            @Override
+                            public void onMouseClicked(MapMouseEvent ev) {
+                                selectFeatures(ev);
+                            }
+                        }));
+                mapFrame.setSize(500, 500);
+                mapFrame.setVisible(true);
+            } catch (IOException e) {
+
+            }
+
+
+        });
+
+        ps.setScene(new Scene(gd, 1200, 500));
+        //gd.getStylesheets().add(MainUI.class.getResource("main.css").toExternalForm());
+        ps.show();
     }
 
     public static void selectFeatures(MapMouseEvent ev) {
@@ -116,18 +211,13 @@ public class MainUI extends Application {
         try {
             SimpleFeatureCollection selectedFeatures =
                     featureSource.getFeatures(filter);
-
-            //System.out.println(selectedFeatures.size());
-
             Set<FeatureId> IDs = new HashSet<>();
             try (SimpleFeatureIterator iter = selectedFeatures.features()) {
                 while (iter.hasNext()) {
                     SimpleFeature feature = iter.next();
                     IDs.add(feature.getIdentifier());
-
                     //System.out.println("   " + feature.getIdentifier());
                 }
-
             }
 
             if (IDs.isEmpty()) {
@@ -177,7 +267,7 @@ public class MainUI extends Application {
                         Convex = QuickStart.convexHull(poly);
                         PolsbyP = QuickStart.PP(poly);
                         Schwartz = QuickStart.Schwartzberg(poly);
-                        logView.setText(logView.getText() + "\n*****RESULTS*****\n"+"\nReock:\t\t\t" + Reock + "\nHarris:\t\t\t" + Harr + "\nConvex Hull:\t\t" + Convex
+                        logView.setText(logView.getText() + "\n*****RESULTS*****\n" + "\nReock:\t\t\t" + Reock + "\nHarris:\t\t\t" + Harr + "\nConvex Hull:\t\t" + Convex
                                 + "\nPolsby-Popper:\t" + PolsbyP + "\nSchwartzberg:\t\t" + Schwartz);
                         break;
                     }
@@ -187,7 +277,7 @@ public class MainUI extends Application {
             }
 
             if (IDs.isEmpty()) {
-                System.out.println("   no feature selected");
+                //System.out.println("   no feature selected");
             }
 
         } catch (Exception ex) {
@@ -269,78 +359,6 @@ public class MainUI extends Application {
         return rule;
     }
 
-    @Override
-    public void start(Stage ps) {
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        ps.setTitle("Prof. Andrew R. M. Komo, Inc.");
-
-        GridPane gd = new GridPane();
-        gd.setAlignment(Pos.TOP_CENTER);
-        gd.setHgap(10);
-        gd.setVgap(10);
-        gd.setPadding(new Insets(25, 25, 25, 25));
-
-        ColumnConstraints col1 = new ColumnConstraints();
-        col1.setPercentWidth(33);
-        ColumnConstraints col2 = new ColumnConstraints();
-        col2.setPercentWidth(33);
-        ColumnConstraints col3 = new ColumnConstraints();
-        col3.setPercentWidth(33);
-        gd.getColumnConstraints().addAll(col1, col2, col3);
-
-        Text scTitle = new Text("Welcome to Prof. Andrew R. M. Komo, Inc (R) Redistricting Maths App!");
-        scTitle.setId("mainText");
-        scTitle.setTextAlignment(TextAlignment.CENTER);
-        VBox tv = new VBox();
-        tv.getChildren().addAll(scTitle);
-        tv.setAlignment(Pos.TOP_CENTER);
-        gd.add(tv, 0, 0, 3, 1);
-
-        Button btn = new Button("Exit");
-        btn.setOnAction(event -> System.exit(0));
-        HBox hbBtn = new HBox(10);
-        hbBtn.setAlignment(Pos.TOP_LEFT);
-        hbBtn.getChildren().add(btn);
-        gd.add(hbBtn, 0, 1);
-
-        Button b2 = new Button("Load File");
-        b2.setOnAction(event -> loadMap());
-        HBox hb2 = new HBox(10);
-        hb2.setAlignment(Pos.TOP_RIGHT);
-        hb2.getChildren().add(b2);
-        gd.add(hb2, 2, 1);
-
-        Button b3 = new Button("Draw Map");
-        b3.setOnAction(event -> {
-            try {
-                drawMap();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        HBox hb3 = new HBox(10);
-        hb3.setAlignment(Pos.TOP_LEFT);
-        hb3.getChildren().add(b3);
-        gd.add(hb3, 1, 1);
-
-        HBox hb4 = new HBox();
-        hb4.setAlignment(Pos.TOP_LEFT);
-        logView.setText(logView.getText() + " at " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        logView.setEditable(false);
-        logView.setStyle("-fx-font-family: \"VT323\",\"Courier New\", monospace; -fx-font-size: 16px;");
-        hb4.getChildren().add(logView);
-        gd.add(hb4, 0, 2, 4, 4);
-
-        ps.setScene(new Scene(gd, 1200, 500));
-        gd.getStylesheets().add(MainUI.class.getResource("main.css").toExternalForm());
-        ps.show();
-    }
-
     private void loadMap() {
 
         //textArea.setVisible(true);
@@ -380,8 +398,8 @@ public class MainUI extends Application {
     }
 
     private void drawMap() throws IOException {
-        if (getRawMap() == null){
-            logView.setText(logView.getText()+"\nNo map loaded! Please load a map!");
+        if (getRawMap() == null) {
+            logView.setText(logView.getText() + "\nNo map loaded! Please load a map!");
         }
         FileDataStore store = FileDataStoreFinder.getDataStore(getRawMap());
         featureSource = store.getFeatureSource();
@@ -437,10 +455,4 @@ public class MainUI extends Application {
         this.mc = mc;
     }
 
-    /*
-     * Convenient constants for the type of feature geometry in the shapefile
-     */
-    private enum GeomType {
-        POINT, LINE, POLYGON
-    }
 }
