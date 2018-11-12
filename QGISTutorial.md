@@ -71,20 +71,20 @@ Right click your new `Dissolved` in the `Layers Panel`, and hit `Save as`. Save 
 
 Download [Professor Komo](https://drive.google.com/open?id=1vvlv61xvNgekhqzbha7X3jEpWXqSoXxn), named after our the glorious '18 Andrew Komo after he won 1st place in Siemens. Once you have downloaded the `.jar` file, run it. You should arrive at the following screen:
 
-![Professor Komo Startup Screen](https://imgur.com/Df5dB8v)
+![Professor Komo Startup Screen](https://imgur.com/Df5dB8v.png)
 
 Click the `Start` button and a menu should pop up to allow you to select your saved `Dissolved.shp` file from above. *Note: As above, **do not** move the shape file by itself out of the directory. You must have all 6(ish) files present for this to work.* 
 
 After selected your `.shp` file, a new window should open, and the original window changes format as follows:
 
-![Professor Komo Initial Map Screen](https://imgur.com/ULnqlOk)
+![Professor Komo Initial Map Screen](https://imgur.com/ULnqlOk.png)
 
 You should notice the following 6 buttons on the map screen:
 
-![Menu Bar](https://imgur.com/rKLul1C)
+![Menu Bar](https://imgur.com/rKLul1C.png)
 
 The second and third can be used to zoom in an our, but the only really relevant ones are the rightmost two. The first option centers your map, and just gives you a good view of the entire map (very helpful if you resize the map window). The second one is our ticket to benchmark calculation. After clicking the `Select` button, simply click on one of your districts. You should see something like the following:
 
-![Professor Komo Final Metrics Screen](https://imgur.com/If2ULBj)
+![Professor Komo Final Metrics Screen](https://imgur.com/If2ULBj.png)
 
 It should be self-explanatory, but the scores on the first window show the 5 metrics for the highlighted yellow district. Selecting another district will make that district yellow, and update the scores. Simply record the values for each of your districts and go analyze your data!
