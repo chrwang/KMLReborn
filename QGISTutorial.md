@@ -79,11 +79,11 @@ After selected your `.shp` file, a new window should open, and the original wind
 
 ![Professor Komo Initial Map Screen](https://imgur.com/ULnqlOk.png)
 
-You should notice the following 6 buttons on the map screen:
+You should notice the following 7 buttons on the map screen:
 
 ![Menu Bar](https://imgur.com/rKLul1C.png)
 
-The second and third can be used to zoom in an our, but the only really relevant ones are the rightmost two. The first option centers your map, and just gives you a good view of the entire map (very helpful if you resize the map window). The second one is our ticket to benchmark calculation. After clicking the `Select` button, simply click on one of your districts. You should see something like the following:
+The second and third can be used to zoom in and out, but the only really relevant ones are the rightmost two. The second to last option centers your map, and just gives you a good view of the entire map (very helpful if you resize the map window). The last button is our ticket to benchmark calculation. After clicking the `Select` button, simply click on one of your districts. You should see something like the following:
 
 ![Professor Komo Final Metrics Screen](https://imgur.com/If2ULBj.png)
 
