@@ -1,4 +1,4 @@
-# A Tutorial on Convex Hull and QGIS
+# A Tutorial on QGIS and Professor Komo
 
 So you've successfully gerrymandered or un-gerrymandered your state... now you want to get some analysis!
 
@@ -10,13 +10,11 @@ Export your map as a `.drf` file by going to `File > Save As` and choose `.drf`.
 This is a "Dave's Redistricting File", which can be used to save your map.
  Later on, if you want to edit your districts, you can import this file into a clean Dave's Redistricting window. If things begin to break when exporting, open a new instance of Dave's Redistricting and import your saved file.
 
-## Calculating Convex Hull in QGIS
-
-### Export to QGIS
+## Export to QGIS
 
 From DRA, go to `File > Save VTD Info to CSV`, and save the resulting file somewhere. It contains information about how you drew your districts as well as vote and racial information for each precinct.
 
-### Merging Your Districts with the Geography
+## Merging Your Districts with the Geography
 
 In order to calculate metrics like convex hull, you will have to combine your districts from DRA with the actual geography of your state.
 You will need a shapefile for your state, which can be obtained from this Google Drive [file](https://drive.google.com/folderview?id=0Bz_uFI8VY7xLZV9tTEFvc0hMdTg&usp=sharing).
@@ -42,7 +40,7 @@ The target field should be `GeoID<number>`. The other options do not matter. Cli
 
 You should now see the join in the `Joins` tab. You can optionally save this file as a KML, if you want to have the precincts displayed in Google Maps.
 
-### Dissolving into Districts
+## Dissolving into Districts
 
 Currently, our map shows the precinct-level geography.
 We want the district-level geography.
@@ -57,6 +55,8 @@ Single-click it, and then click the single rightwards arrow to move it into the 
 Leave everything else as it is:
 ![Dissolve Example](https://i.imgur.com/pjTX0KZ.png)
 
+`Note: This menu might look slightly different depending on which version of QGIS you have installed (this tutorial made for QGIS 2.18.*). `
+
 Click the `Run` button, and wait for the operation to complete.
 This could take anywhere from 2 seconds to a minute, depending on how fast your computer is.
 
@@ -65,30 +65,26 @@ Uncheck all other layers in the sidebar, and verify that the operation completed
 The map should look like your districts.
 If the screen is blank, repeat the dissolve procedure again, and make sure you are selecting the right layers.
 
-### Calculating Convex Hull
-We first need to name each of the districts that have just been created.
-Right click the `Dissolved` layer, and select `Open Attribute Table`.
-You should see a blank column called `Name` or something similar.
-The number of rows should be equal to the number of districts you have, and the nth row corresponds to the nth district in DRA.
-In the Attribute Table, click the Pencil icon
-Put some text in that field for each district.
-You can put whatever you want, but each box should be unique.
-We need this field in order for QGIS to do each district individually.
+Right click your new `Dissolved` in the `Layers Panel`, and hit `Save as`. Save the layer as a shape (`.shp`) layer
 
-Now, go to `Vector > Geoprocessing Tools > Convex Hull`.
-A new window will open.
-Choose your `Dissolved` layer as the `Input Layer`.
-For `Field`, choose the `Name` field that we created earlier.
-For `Method`, choose `Create convex hulls based on field`.
-Click run, and wait for the operation to finish.
+## Getting into Professor Komo
 
-Once this completes, you should see a convex hull created for each district in your state.
-Right click the `Convex Hull` in the `Layers Panel`, and click `Save as`.
-Save the layer as a KML file.
+Download [Professor Komo](https://drive.google.com/open?id=1vvlv61xvNgekhqzbha7X3jEpWXqSoXxn), named after our the glorious '18 Andrew Komo after he won 1st place in Siemens. Once you have downloaded the `.jar` file, run it. You should arrive at the following screen:
 
-Go to [Google MyMaps](https://www.google.com/mymaps/) and create a new map.
-In the menu on the left, click `Add layer`, which will add an `Untitled Layer` in the menu.
-Name the layer whatever you want.
-Under the layer name, click `Import`, and add your KML file.
-Once the map loads, you should see the convex hulls on the map.
-If you click a hull, you'll see values for both the perimeter and the area. 
+![Professor Komo Startup Screen](https://imgur.com/a/sajYce2)
+
+Click the `Start` button and a menu should pop up to allow you to select your saved `Dissolved.shp` file from above. *Note: As above, **do not** move the shape file by itself out of the directory. You must have all 6(ish) files present for this to work.* 
+
+After selected your `.shp` file, a new window should open, and the original window changes format as follows:
+
+![Professor Komo Initial Map Screen](https://imgur.com/a/vMttmaM)
+
+You should notice the following 6 buttons on the map screen:
+
+![Menu Bar](https://imgur.com/a/3goWTLX)
+
+The second and third can be used to zoom in an our, but the only really relevant ones are the rightmost two. The first option centers your map, and just gives you a good view of the entire map (very helpful if you resize the map window). The second one is our ticket to benchmark calculation. After clicking the `Select` button, simply click on one of your districts. You should see something like the following:
+
+![Professor Komo Final Metrics Screen](https://imgur.com/a/28v4X8E)
+
+It should be self-explanatory, but the scores on the first window show the 5 metrics for the highlighted yellow district. Selecting another district will make that district yellow, and update the scores. Simply record the values for each of your districts and go analyze your data!
